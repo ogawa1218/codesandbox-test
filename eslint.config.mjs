@@ -13,25 +13,8 @@ const eslintConfig = [
     rules: {
       "react/no-danger": "error",
       "@typescript-eslint/no-explicit-any": "error",
-      "no-restricted-imports": [
-        "error",
-        {
-          paths: [
-            {
-              name: "@/lib/supabase/admin",
-              message:
-                "admin (service-role) は Server Action / Route Handler 内のみで使用してください。",
-            },
-          ],
-          patterns: [
-            {
-              group: ["**/lib/supabase/admin"],
-              message:
-                "service-role を含むモジュールは server-only ファイル経由のみで読み込んでください。",
-            },
-          ],
-        },
-      ],
+      // service-role の混入は lib/supabase/admin.ts 冒頭の
+      // `import "server-only"` で build-time に防ぐ。
       "no-restricted-syntax": [
         "error",
         {

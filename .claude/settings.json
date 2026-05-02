@@ -46,7 +46,5 @@
       "Read(./.claude/settings.local.json)"
     ]
   },
-  "env": {
-    "NODE_ENV": "development"
-  }
+  "env": {}
 }
