@@ -17,10 +17,10 @@ export default async function LoginPage({
             <span className="text-xl font-bold text-white">PL</span>
           </div>
           <h1 className="mt-4 text-2xl font-semibold tracking-tight text-white">
-            店舗 PL 管理
+            ドラッグストア PL 管理
           </h1>
           <p className="mt-1 text-sm text-white/60">
-            シフト・売上・連絡を一つに
+            シフト・売上・業務連絡を一つに
           </p>
         </div>
         <Card>

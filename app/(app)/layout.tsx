@@ -54,7 +54,7 @@ export default async function AppLayout({
             <span className="text-sm font-bold text-white">PL</span>
           </div>
           <div className="hidden sm:block">
-            <div className="text-xs text-white/50">{store?.name ?? "店舗 PL"}</div>
+            <div className="text-xs text-white/50">{store?.name ?? "ドラッグストア PL"}</div>
             <div className="text-sm font-medium text-white">
               {profile?.full_name ?? user.email}
             </div>

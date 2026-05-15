@@ -16,8 +16,9 @@ const notoJP = Noto_Sans_JP({
 });
 
 export const metadata: Metadata = {
-  title: "店舗 PL — シフト・売上・連絡を一つに",
-  description: "店舗運営のための統合管理ダッシュボード",
+  title: "ドラッグストア PL — シフト・売上・連絡を一つに",
+  description:
+    "ドラッグストア向け統合管理ダッシュボード。シフト作成・売上集計・業務連絡を一画面で。",
 };
 
 export const viewport: Viewport = {
