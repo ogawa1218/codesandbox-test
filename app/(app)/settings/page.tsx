@@ -19,7 +19,7 @@ export default async function SettingsPage() {
       .order("sort_order"),
     supabase
       .from("profiles")
-      .select("id, full_name, role, hourly_wage, created_at, deleted_at")
+      .select("id, full_name, role, license, hourly_wage, created_at, deleted_at")
       .eq("store_id", storeId)
       .is("deleted_at", null)
       .order("full_name"),

@@ -11,6 +11,17 @@ export const yenAmount = z
 
 export const shiftStatusSchema = z.enum(["draft", "confirmed", "canceled"]);
 export const userRoleSchema = z.enum(["manager", "employee"]);
+export const staffLicenseSchema = z.enum([
+  "pharmacist",
+  "registered_seller",
+  "none",
+]);
+export type StaffLicense = z.infer<typeof staffLicenseSchema>;
+export const STAFF_LICENSE_LABEL: Record<StaffLicense, string> = {
+  pharmacist: "薬剤師",
+  registered_seller: "登録販売者",
+  none: "資格なし",
+};
 
 export const positionSchema = z
   .object({
@@ -48,6 +59,11 @@ export const salesActualSchema = z
   .object({
     business_date: isoDate,
     amount: yenAmount,
+    amount_dispensing: yenAmount.default(0),
+    amount_otc: yenAmount.default(0),
+    amount_cosmetics: yenAmount.default(0),
+    amount_food: yenAmount.default(0),
+    rx_count: z.number().int().nonnegative().max(99_999).default(0),
     tax_included: z.boolean().default(true),
     tax_rate: z.number().min(0).max(0.5).default(0.1),
   })
@@ -76,6 +92,7 @@ export const inviteSchema = z
   .object({
     full_name: z.string().trim().min(1).max(40),
     role: userRoleSchema.default("employee"),
+    license: staffLicenseSchema.default("none"),
     hourly_wage: z
       .number()
       .min(0)

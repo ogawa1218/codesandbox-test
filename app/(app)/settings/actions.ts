@@ -96,6 +96,7 @@ export async function inviteEmployee(formData: FormData): Promise<ActionResult<{
   const parsed = inviteSchema.safeParse({
     full_name: formData.get("full_name"),
     role: formData.get("role") ?? "employee",
+    license: formData.get("license") ?? "none",
     hourly_wage: formData.get("hourly_wage")
       ? Number(formData.get("hourly_wage"))
       : null,
@@ -112,6 +113,7 @@ export async function inviteEmployee(formData: FormData): Promise<ActionResult<{
     invited_by: ctx.user.id,
     full_name: parsed.data.full_name,
     role: parsed.data.role,
+    license: parsed.data.license,
     hourly_wage: parsed.data.hourly_wage ?? null,
     email: parsed.data.email ?? null,
     token,

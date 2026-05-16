@@ -12,6 +12,11 @@ type KpiRow = {
   sales_budget: number;
   labor_cost: number;
   labor_ratio: number;
+  rx_sales: number;
+  otc_sales: number;
+  rx_count: number;
+  rx_ratio: number;
+  rx_unit_price: number;
 };
 
 export default async function DashboardPage() {
@@ -32,6 +37,11 @@ export default async function DashboardPage() {
     sales_budget: 0,
     labor_cost: 0,
     labor_ratio: 0,
+    rx_sales: 0,
+    otc_sales: 0,
+    rx_count: 0,
+    rx_ratio: 0,
+    rx_unit_price: 0,
   };
 
   const achievement =
@@ -118,6 +128,29 @@ export default async function DashboardPage() {
           value={formatPct(kpi.labor_ratio)}
           hint={Number(kpi.labor_ratio) > 0.3 ? "目安超過" : "良好"}
           trend={Number(kpi.labor_ratio) > 0.3 ? "down" : "up"}
+        />
+      </div>
+
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <Stat
+          label="調剤売上(税抜)"
+          value={formatYen(kpi.rx_sales)}
+          hint={`OTC ${formatYen(kpi.otc_sales)}`}
+        />
+        <Stat
+          label="調剤構成比"
+          value={formatPct(kpi.rx_ratio)}
+          hint="売上に占める調剤の割合"
+        />
+        <Stat
+          label="処方箋枚数"
+          value={`${Number(kpi.rx_count).toLocaleString("ja-JP")}枚`}
+          hint="当月累計"
+        />
+        <Stat
+          label="処方箋単価(税抜)"
+          value={formatYen(kpi.rx_unit_price)}
+          hint="調剤売上 ÷ 処方箋枚数"
         />
       </div>
 

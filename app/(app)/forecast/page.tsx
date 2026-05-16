@@ -30,7 +30,9 @@ export default async function ForecastPage({
   const [{ data: sales }, { data: budgets }] = await Promise.all([
     supabase
       .from("sales_actuals")
-      .select("business_date, amount, tax_included, tax_rate")
+      .select(
+        "business_date, amount, amount_dispensing, amount_otc, amount_cosmetics, amount_food, rx_count, tax_included, tax_rate",
+      )
       .eq("store_id", storeId)
       .gte("business_date", startISO)
       .lte("business_date", endISO),
@@ -42,19 +44,30 @@ export default async function ForecastPage({
       .lte("business_date", endISO),
   ]);
 
-  const days: Array<{ date: string; budget: number; actual: number | null }> = [];
+  const days: Array<{
+    date: string;
+    budget: number;
+    actual: number | null;
+    dispensing: number;
+    otc: number;
+    cosmetics: number;
+    food: number;
+    rxCount: number;
+  }> = [];
   for (let d = 1; d <= monthEnd.getDate(); d++) {
     const iso = `${monthStart.getFullYear()}-${String(monthStart.getMonth() + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
     const sale = sales?.find((s) => s.business_date === iso);
-    const budget = budgets?.find((b) => b.business_date === iso);
     days.push({
       date: iso,
-      budget: budget ? Number(budget.amount) : 0,
-      actual: sale
-        ? sale.tax_included
-          ? Math.round(Number(sale.amount) / (1 + Number(sale.tax_rate)))
-          : Number(sale.amount)
-        : null,
+      budget: budgets?.find((b) => b.business_date === iso)
+        ? Number(budgets.find((b) => b.business_date === iso)!.amount)
+        : 0,
+      actual: sale ? Number(sale.amount) : null,
+      dispensing: sale ? Number(sale.amount_dispensing) : 0,
+      otc: sale ? Number(sale.amount_otc) : 0,
+      cosmetics: sale ? Number(sale.amount_cosmetics) : 0,
+      food: sale ? Number(sale.amount_food) : 0,
+      rxCount: sale ? Number(sale.rx_count) : 0,
     });
   }
 

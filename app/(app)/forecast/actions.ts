@@ -6,11 +6,17 @@ import { createClient } from "@/lib/supabase/server";
 import { check } from "@/lib/rate-limit";
 import { fail, ok, type ActionResult } from "@/lib/result";
 
+const yen = z.coerce.number().int().min(0).max(999_999_999_999);
 const upsertSchema = z
   .object({
     business_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-    budget: z.coerce.number().int().min(0).max(999_999_999_999).optional(),
-    actual: z.coerce.number().int().min(0).max(999_999_999_999).optional(),
+    budget: yen.optional(),
+    actual: yen.optional(),
+    amount_dispensing: yen.optional(),
+    amount_otc: yen.optional(),
+    amount_cosmetics: yen.optional(),
+    amount_food: yen.optional(),
+    rx_count: z.coerce.number().int().min(0).max(99_999).optional(),
     tax_included: z.coerce.boolean().default(true),
     tax_rate: z.coerce.number().min(0).max(0.5).default(0.1),
   })
@@ -54,14 +60,27 @@ export async function saveDayBudgetAndSales(
     if (error) return fail({ code: "unknown", message: error.message });
   }
 
-  if (parsed.data.actual != null) {
+  const d = parsed.data;
+  const hasSales =
+    d.actual != null ||
+    d.amount_dispensing != null ||
+    d.amount_otc != null ||
+    d.amount_cosmetics != null ||
+    d.amount_food != null ||
+    d.rx_count != null;
+  if (hasSales) {
     const { error } = await supabase.from("sales_actuals").upsert(
       {
         store_id: storeId,
-        business_date: parsed.data.business_date,
-        amount: parsed.data.actual,
-        tax_included: parsed.data.tax_included,
-        tax_rate: parsed.data.tax_rate,
+        business_date: d.business_date,
+        amount: d.actual ?? 0,
+        amount_dispensing: d.amount_dispensing ?? 0,
+        amount_otc: d.amount_otc ?? 0,
+        amount_cosmetics: d.amount_cosmetics ?? 0,
+        amount_food: d.amount_food ?? 0,
+        rx_count: d.rx_count ?? 0,
+        tax_included: d.tax_included,
+        tax_rate: d.tax_rate,
         updated_by: user.id,
       },
       { onConflict: "store_id,business_date" },

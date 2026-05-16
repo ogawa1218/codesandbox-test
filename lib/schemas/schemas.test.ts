@@ -57,17 +57,44 @@ describe("shiftSchema", () => {
 });
 
 describe("salesActualSchema", () => {
-  it("defaults tax to 10%", () => {
+  it("defaults tax + drugstore breakdown to zero", () => {
     const r = salesActualSchema.parse({
       business_date: "2026-05-02",
       amount: 100000,
     });
     expect(r.tax_rate).toBe(0.1);
     expect(r.tax_included).toBe(true);
+    expect(r.amount_dispensing).toBe(0);
+    expect(r.amount_otc).toBe(0);
+    expect(r.amount_cosmetics).toBe(0);
+    expect(r.amount_food).toBe(0);
+    expect(r.rx_count).toBe(0);
+  });
+  it("accepts drugstore category breakdown", () => {
+    const r = salesActualSchema.parse({
+      business_date: "2026-05-02",
+      amount: 500000,
+      amount_dispensing: 300000,
+      amount_otc: 120000,
+      amount_cosmetics: 50000,
+      amount_food: 30000,
+      rx_count: 42,
+    });
+    expect(r.amount_dispensing).toBe(300000);
+    expect(r.rx_count).toBe(42);
   });
   it("rejects negative amount", () => {
     expect(() =>
       salesActualSchema.parse({ business_date: "2026-05-02", amount: -1 }),
+    ).toThrow();
+  });
+  it("rejects fractional rx_count", () => {
+    expect(() =>
+      salesActualSchema.parse({
+        business_date: "2026-05-02",
+        amount: 1000,
+        rx_count: 1.5,
+      }),
     ).toThrow();
   });
 });
@@ -92,8 +119,20 @@ describe("announcementSchema", () => {
 });
 
 describe("inviteSchema", () => {
-  it("defaults role to employee", () => {
-    expect(inviteSchema.parse({ full_name: "Alice" }).role).toBe("employee");
+  it("defaults role to employee and license to none", () => {
+    const r = inviteSchema.parse({ full_name: "Alice" });
+    expect(r.role).toBe("employee");
+    expect(r.license).toBe("none");
+  });
+  it("accepts pharmacist license", () => {
+    expect(
+      inviteSchema.parse({ full_name: "Bob", license: "pharmacist" }).license,
+    ).toBe("pharmacist");
+  });
+  it("rejects unknown license value", () => {
+    expect(() =>
+      inviteSchema.parse({ full_name: "Bob", license: "doctor" }),
+    ).toThrow();
   });
   it("uuid example", () => {
     expect(uuid4).toMatch(/^[0-9a-f-]+$/);

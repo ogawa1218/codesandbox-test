@@ -4,11 +4,13 @@ import { Input } from "@/components/ui/input";
 import { updateWage } from "./actions";
 import { toast } from "sonner";
 import { formatYen } from "@/lib/utils";
+import { STAFF_LICENSE_LABEL, type StaffLicense } from "@/lib/schemas";
 
 interface Employee {
   id: string;
   full_name: string;
   role: "manager" | "employee";
+  license: StaffLicense;
   hourly_wage: number | null;
   created_at: string;
   deleted_at: string | null;
@@ -27,7 +29,14 @@ export function EmployeesList({ employees }: { employees: Employee[] }) {
             {emp.full_name.slice(0, 1)}
           </div>
           <div className="min-w-0 flex-1">
-            <div className="text-sm text-white">{emp.full_name}</div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-white">{emp.full_name}</span>
+              {emp.license !== "none" ? (
+                <span className="rounded-full bg-violet-500/20 px-2 py-0.5 text-[10px] font-medium text-violet-200">
+                  {STAFF_LICENSE_LABEL[emp.license]}
+                </span>
+              ) : null}
+            </div>
             <div className="text-[11px] uppercase tracking-wider text-white/50">
               {emp.role}
             </div>

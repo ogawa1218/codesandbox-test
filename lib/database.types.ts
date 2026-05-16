@@ -208,6 +208,7 @@ export type Database = {
           hourly_wage: number | null
           id: string
           invited_by: string | null
+          license: Database["public"]["Enums"]["staff_license"]
           role: Database["public"]["Enums"]["user_role"]
           store_id: string
           token: string
@@ -221,6 +222,7 @@ export type Database = {
           hourly_wage?: number | null
           id?: string
           invited_by?: string | null
+          license?: Database["public"]["Enums"]["staff_license"]
           role?: Database["public"]["Enums"]["user_role"]
           store_id: string
           token: string
@@ -234,6 +236,7 @@ export type Database = {
           hourly_wage?: number | null
           id?: string
           invited_by?: string | null
+          license?: Database["public"]["Enums"]["staff_license"]
           role?: Database["public"]["Enums"]["user_role"]
           store_id?: string
           token?: string
@@ -331,6 +334,7 @@ export type Database = {
           full_name: string
           hourly_wage: number | null
           id: string
+          license: Database["public"]["Enums"]["staff_license"]
           line_id: string | null
           role: Database["public"]["Enums"]["user_role"]
           store_id: string | null
@@ -342,6 +346,7 @@ export type Database = {
           full_name: string
           hourly_wage?: number | null
           id: string
+          license?: Database["public"]["Enums"]["staff_license"]
           line_id?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           store_id?: string | null
@@ -353,6 +358,7 @@ export type Database = {
           full_name?: string
           hourly_wage?: number | null
           id?: string
+          license?: Database["public"]["Enums"]["staff_license"]
           line_id?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           store_id?: string | null
@@ -363,8 +369,13 @@ export type Database = {
       sales_actuals: {
         Row: {
           amount: number
+          amount_cosmetics: number
+          amount_dispensing: number
+          amount_food: number
+          amount_otc: number
           business_date: string
           id: string
+          rx_count: number
           store_id: string
           tax_included: boolean
           tax_rate: number
@@ -373,8 +384,13 @@ export type Database = {
         }
         Insert: {
           amount?: number
+          amount_cosmetics?: number
+          amount_dispensing?: number
+          amount_food?: number
+          amount_otc?: number
           business_date: string
           id?: string
+          rx_count?: number
           store_id: string
           tax_included?: boolean
           tax_rate?: number
@@ -383,8 +399,13 @@ export type Database = {
         }
         Update: {
           amount?: number
+          amount_cosmetics?: number
+          amount_dispensing?: number
+          amount_food?: number
+          amount_otc?: number
           business_date?: string
           id?: string
+          rx_count?: number
           store_id?: string
           tax_included?: boolean
           tax_rate?: number
@@ -651,6 +672,11 @@ export type Database = {
         Returns: {
           labor_cost: number
           labor_ratio: number
+          otc_sales: number
+          rx_count: number
+          rx_ratio: number
+          rx_sales: number
+          rx_unit_price: number
           sales_actual: number
           sales_budget: number
         }[]
@@ -662,6 +688,7 @@ export type Database = {
     }
     Enums: {
       shift_status: "draft" | "confirmed" | "canceled"
+      staff_license: "pharmacist" | "registered_seller" | "none"
       user_role: "manager" | "employee"
     }
     CompositeTypes: {

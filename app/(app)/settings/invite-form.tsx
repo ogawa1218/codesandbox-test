@@ -43,6 +43,19 @@ export function InviteForm() {
         </select>
       </div>
       <div className="flex flex-col gap-1">
+        <Label htmlFor="license">資格</Label>
+        <select
+          id="license"
+          name="license"
+          defaultValue="none"
+          className="h-10 w-full rounded-xl border border-white/10 bg-white/5 px-3 text-sm text-white"
+        >
+          <option value="none">資格なし</option>
+          <option value="pharmacist">薬剤師</option>
+          <option value="registered_seller">登録販売者</option>
+        </select>
+      </div>
+      <div className="flex flex-col gap-1">
         <Label htmlFor="hourly_wage">時給(円)</Label>
         <Input id="hourly_wage" name="hourly_wage" type="number" min={0} max={99999} />
       </div>
