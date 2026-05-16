@@ -8,6 +8,7 @@ interface Item {
   title: string;
   body: string;
   image_path: string | null;
+  pdf_path: string | null;
   author_id: string;
   author_name: string;
   created_at: string;
@@ -25,21 +26,36 @@ export function BulletinFeed({
 }) {
   const [items, setItems] = useState(initial);
   const [signedUrls, setSignedUrls] = useState<Record<string, string>>({});
+  const [pdfUrls, setPdfUrls] = useState<Record<string, string>>({});
 
-  // Resolve signed URLs for any image_path
+  // Resolve short-lived signed URLs for image (announcements) and PDF (manuals)
   useEffect(() => {
     const supabase = createClient();
-    const paths = items.filter((i) => i.image_path).map((i) => i.image_path!);
-    if (paths.length === 0) return;
     void (async () => {
-      const map: Record<string, string> = {};
-      const { data } = await supabase.storage
-        .from("announcements")
-        .createSignedUrls(paths, 600);
-      for (const entry of data ?? []) {
-        if (entry.signedUrl && entry.path) map[entry.path] = entry.signedUrl;
+      const imgPaths = items
+        .filter((i) => i.image_path)
+        .map((i) => i.image_path!);
+      if (imgPaths.length) {
+        const { data } = await supabase.storage
+          .from("announcements")
+          .createSignedUrls(imgPaths, 600);
+        const map: Record<string, string> = {};
+        for (const e of data ?? []) {
+          if (e.signedUrl && e.path) map[e.path] = e.signedUrl;
+        }
+        setSignedUrls(map);
       }
-      setSignedUrls(map);
+      const pdfPaths = items.filter((i) => i.pdf_path).map((i) => i.pdf_path!);
+      if (pdfPaths.length) {
+        const { data } = await supabase.storage
+          .from("manuals")
+          .createSignedUrls(pdfPaths, 600);
+        const map: Record<string, string> = {};
+        for (const e of data ?? []) {
+          if (e.signedUrl && e.path) map[e.path] = e.signedUrl;
+        }
+        setPdfUrls(map);
+      }
     })();
   }, [items]);
 
@@ -62,6 +78,7 @@ export function BulletinFeed({
             title: string;
             body: string;
             image_path: string | null;
+            pdf_path: string | null;
             author_id: string;
             created_at: string;
           };
@@ -156,6 +173,16 @@ export function BulletinFeed({
               alt=""
               className="mt-3 max-h-80 w-auto rounded-xl border border-white/10"
             />
+          ) : null}
+          {it.pdf_path && pdfUrls[it.pdf_path] ? (
+            <a
+              href={pdfUrls[it.pdf_path]}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-3 inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-cyan-300 hover:bg-white/10"
+            >
+              PDF を開く
+            </a>
           ) : null}
           {userId ? null : null}
         </li>

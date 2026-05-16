@@ -29,6 +29,7 @@ export async function postAnnouncement(
     title: formData.get("title"),
     body: formData.get("body"),
     image_path: formData.get("image_path") || undefined,
+    pdf_path: formData.get("pdf_path") || undefined,
   });
   if (!parsed.success) return fail({ code: "validation", message: "入力を確認してください" });
 
@@ -40,6 +41,7 @@ export async function postAnnouncement(
       title: parsed.data.title,
       body: parsed.data.body,
       image_path: parsed.data.image_path ?? null,
+      pdf_path: parsed.data.pdf_path ?? null,
     })
     .select("id")
     .single();

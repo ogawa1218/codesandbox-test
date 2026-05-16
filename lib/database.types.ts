@@ -37,6 +37,7 @@ export type Database = {
           created_at: string
           id: string
           image_path: string | null
+          pdf_path: string | null
           store_id: string
           title: string
         }
@@ -46,6 +47,7 @@ export type Database = {
           created_at?: string
           id?: string
           image_path?: string | null
+          pdf_path?: string | null
           store_id: string
           title: string
         }
@@ -55,6 +57,7 @@ export type Database = {
           created_at?: string
           id?: string
           image_path?: string | null
+          pdf_path?: string | null
           store_id?: string
           title?: string
         }

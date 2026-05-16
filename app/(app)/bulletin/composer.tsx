@@ -8,12 +8,13 @@ import { toast } from "sonner";
 export function BulletinComposer({ storeId }: { storeId: string }) {
   const [pending, start] = useTransition();
   const [imagePath, setImagePath] = useState<string | null>(null);
+  const [pdfPath, setPdfPath] = useState<string | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
-  async function uploadImage(file: File) {
+  async function upload(file: File, bucket: "announcements" | "manuals") {
     const fd = new FormData();
     fd.set("file", file);
-    fd.set("bucket", "announcements");
+    fd.set("bucket", bucket);
     fd.set("store_id", storeId);
     const res = await fetch("/api/upload", { method: "POST", body: fd });
     if (!res.ok) {
@@ -30,6 +31,7 @@ export function BulletinComposer({ storeId }: { storeId: string }) {
         e.preventDefault();
         const fd = new FormData(e.currentTarget);
         if (imagePath) fd.set("image_path", imagePath);
+        if (pdfPath) fd.set("pdf_path", pdfPath);
         start(async () => {
           const r = await postAnnouncement(fd);
           if (!r.ok) {
@@ -38,6 +40,7 @@ export function BulletinComposer({ storeId }: { storeId: string }) {
             toast.success("投稿しました");
             formRef.current?.reset();
             setImagePath(null);
+            setPdfPath(null);
           }
         });
       }}
@@ -61,7 +64,7 @@ export function BulletinComposer({ storeId }: { storeId: string }) {
             const file = e.target.files?.[0];
             if (!file) return;
             try {
-              const path = await uploadImage(file);
+              const path = await upload(file, "announcements");
               setImagePath(path);
               toast.success("画像をアップロードしました");
             } catch (err) {
@@ -72,6 +75,30 @@ export function BulletinComposer({ storeId }: { storeId: string }) {
         {imagePath ? (
           <p className="text-[11px] text-white/50">
             添付済: {imagePath.split("/").pop()}
+          </p>
+        ) : null}
+      </div>
+      <div className="flex flex-col gap-1">
+        <Label htmlFor="pdf">PDF(任意・最大 20MB)</Label>
+        <Input
+          id="pdf"
+          type="file"
+          accept="application/pdf"
+          onChange={async (e) => {
+            const file = e.target.files?.[0];
+            if (!file) return;
+            try {
+              const path = await upload(file, "manuals");
+              setPdfPath(path);
+              toast.success("PDF をアップロードしました");
+            } catch (err) {
+              toast.error((err as Error).message);
+            }
+          }}
+        />
+        {pdfPath ? (
+          <p className="text-[11px] text-white/50">
+            添付済: {pdfPath.split("/").pop()}
           </p>
         ) : null}
       </div>

@@ -20,7 +20,7 @@ export default async function BulletinPage() {
   const [{ data: announcements }, { data: reads }] = await Promise.all([
     supabase
       .from("announcements")
-      .select("id, title, body, image_path, author_id, created_at")
+      .select("id, title, body, image_path, pdf_path, author_id, created_at")
       .eq("store_id", storeId)
       .order("created_at", { ascending: false })
       .limit(50),

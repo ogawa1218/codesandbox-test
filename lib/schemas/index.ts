@@ -84,6 +84,7 @@ export const announcementSchema = z
     title: z.string().trim().min(1).max(80),
     body: z.string().trim().min(1).max(2000),
     image_path: z.string().max(500).nullable().optional(),
+    pdf_path: z.string().max(500).nullable().optional(),
   })
   .strict();
 export type AnnouncementInput = z.infer<typeof announcementSchema>;
