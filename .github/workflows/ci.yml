@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [main, "claude/**"]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Dummy values just for build-time imports; runtime never executes against
+  # these. Production values are injected on Vercel.
+  NEXT_PUBLIC_SUPABASE_URL: https://stub.supabase.co
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: stub-anon-key
+  SUPABASE_SERVICE_ROLE_KEY: stub-service-role-key
+  NEXT_PUBLIC_APP_ORIGIN: http://localhost:3000
+
+jobs:
+  verify:
+    name: typecheck / lint / test / build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Unit tests
+        run: npx vitest run --reporter=basic
+
+      - name: Build
+        run: npm run build

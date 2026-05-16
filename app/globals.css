@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+  html, body {
+    background: #0a0a0f;
+    color: #e7e9f3;
+    font-feature-settings: "ss01", "cv11";
+  }
+  body {
+    background:
+      radial-gradient(ellipse at 15% 0%, oklch(0.45 0.20 296 / 0.45) 0px, transparent 60%),
+      radial-gradient(ellipse at 85% 10%, oklch(0.50 0.21 320 / 0.40) 0px, transparent 55%),
+      radial-gradient(ellipse at 50% 100%, oklch(0.60 0.16 200 / 0.30) 0px, transparent 60%),
+      #0a0a0f;
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+  ::selection {
+    background-color: oklch(0.65 0.21 296 / 0.4);
+  }
+}
+
+@layer utilities {
+  .glass {
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(16px) saturate(140%);
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .text-balance {
+    text-wrap: balance;
+  }
+}
