@@ -79,6 +79,51 @@ export async function upsertShift(input: unknown): Promise<ActionResult<{ id: st
   return ok({ id: data!.id });
 }
 
+const moveSchema = z
+  .object({
+    id: z.string().uuid(),
+    employee_id: z.string().uuid(),
+    business_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+    starts_at: z.string().datetime(),
+    ends_at: z.string().datetime(),
+  })
+  .refine((v) => new Date(v.ends_at) > new Date(v.starts_at), {
+    path: ["ends_at"],
+  });
+
+export async function moveShift(input: unknown): Promise<ActionResult<null>> {
+  const ctx = await ctxManager();
+  if (ctx.err) return fail({ code: ctx.err, message: "権限がありません" });
+
+  const rl = await check("write", ctx.user.id);
+  if (!rl.ok) return fail({ code: "rate_limited", message: "操作回数が多すぎます" });
+
+  const parsed = moveSchema.safeParse(input);
+  if (!parsed.success) return fail({ code: "validation", message: "入力を確認してください" });
+
+  const v = parsed.data;
+  const { error } = await ctx.supabase
+    .from("shifts")
+    .update({
+      employee_id: v.employee_id,
+      business_date: v.business_date,
+      starts_at: v.starts_at,
+      ends_at: v.ends_at,
+    })
+    .eq("id", v.id)
+    .eq("store_id", ctx.storeId);
+  if (error) {
+    if (error.code === "23P01") {
+      return fail({ code: "conflict", message: "確定済みシフトと時間が重複しています" });
+    }
+    return fail({ code: "unknown", message: error.message });
+  }
+  revalidatePath("/shifts");
+  revalidatePath("/dashboard");
+  revalidatePath("/my-shifts");
+  return ok(null);
+}
+
 const idSchema = z.object({ id: z.string().uuid() });
 
 export async function deleteShift(id: string): Promise<ActionResult<null>> {

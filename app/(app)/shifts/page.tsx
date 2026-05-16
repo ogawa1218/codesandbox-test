@@ -30,8 +30,8 @@ export default async function ShiftsPage({
   const supabase = await createClient();
   const [employeesRes, positionsRes, shiftsRes] = await Promise.all([
     supabase
-      .from("profiles_public")
-      .select("id, full_name, role")
+      .from("profiles")
+      .select("id, full_name, role, hourly_wage")
       .eq("store_id", storeId)
       .is("deleted_at", null)
       .order("full_name"),
@@ -75,11 +75,12 @@ export default async function ShiftsPage({
         <CardContent>
           <ShiftScheduler
             weekStart={startISO}
-            employees={(employeesRes.data ?? [])
-              .filter(
-                (e): e is { id: string; full_name: string | null; role: "manager" | "employee" | null } =>
-                  typeof e.id === "string",
-              )}
+            employees={(employeesRes.data ?? []).map((e) => ({
+              id: e.id,
+              full_name: e.full_name,
+              role: e.role,
+              hourly_wage: e.hourly_wage,
+            }))}
             positions={positionsRes.data ?? []}
             shifts={shiftsRes.data ?? []}
           />
